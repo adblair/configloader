@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='configloader',
-    version='0.1.0',
+    version='0.1.0-dev0',
     description="Python dict that supports common app configuration-loading scenarios.",
     long_description=readme + '\n\n' + history,
     author="Arthur Blair",

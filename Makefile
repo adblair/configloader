@@ -10,9 +10,12 @@ help:
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - package and upload a release"
+	@echo "release - make a new release, upload it to PyPI and push to Git"
+	@echo "devrelease - upload a development release"
 	@echo "dist - package"
 	@echo "install - install the package to the active Python's site-packages"
+	@echo "bumpminor - increment the minor version number of the next release"
+	@echo "bumpmajor - increment the major version number of the next release"
 
 clean: clean-build clean-pyc clean-test
 
@@ -57,9 +60,16 @@ docs:
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
 
-release: clean
-	python setup.py sdist upload
+release: clean test-all
+	bumpversion release
 	python setup.py bdist_wheel upload
+	python setup.py sdist upload
+	bumpversion --no-tag patch
+	git push --tags
+
+devrelease: clean test-all
+	python setup.py bdist_wheel upload
+	python setup.py sdist upload
 
 dist: clean
 	python setup.py sdist
@@ -68,3 +78,9 @@ dist: clean
 
 install: clean
 	python setup.py install
+
+bumpminor:
+	bumpversion --no-tag minor
+
+bumpmajor:
+	bumpversion --no-tag major
