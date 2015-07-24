@@ -1,28 +1,18 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-"""
-test_configloader
-----------------------------------
-
-Tests for `configloader` module.
-"""
-
-import unittest
 
 from configloader import ConfigLoader
 
 
-class TestConfigloader(unittest.TestCase):
+class Object(object):
+    pass
 
-    def setUp(self):
-        pass
 
-    def test_something(self):
-        pass
+class TestConfigLoader:
 
-    def tearDown(self):
-        pass
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_update_from_obj(self):
+        config = ConfigLoader()
+        obj = Object()
+        obj.setting = 'value'
+        obj.SETTING = 'value'
+        config.update_from_obj(obj)
+        assert config == {'SETTING': 'value'}
