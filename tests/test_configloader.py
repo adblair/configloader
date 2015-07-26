@@ -20,6 +20,32 @@ test_yaml = textwrap.dedent("""
       foo: bar
 """).strip()
 
+test_json = textwrap.dedent("""
+    {
+        "SETTING1": "x",
+        "SETTING2": [1, 2],
+        "SETTING3": {"foo": "bar"}
+    }
+""").strip()
+
+test_config = {
+    'SETTING1': 'x',
+    'SETTING2': [1, 2],
+    'SETTING3': {'foo': 'bar'},
+}
+
+
+def load_test_data(config_loader, test_data, load_func, method):
+    with tempfile.NamedTemporaryFile('wt') as configfile:
+        configfile.write(test_data)
+        configfile.seek(0)
+        if method == 'file':
+            getattr(config_loader, load_func)(configfile.name)
+        elif method == 'env':
+            os.environ['TEMP_FILEPATH'] = configfile.name
+            getattr(config_loader, load_func)('TEMP_FILEPATH')
+            del os.environ['TEMP_FILEPATH']
+
 
 class TestConfigLoader:
 
@@ -33,30 +59,20 @@ class TestConfigLoader:
 
     def test_update_from_yaml_env(self):
         config = ConfigLoader()
-
-        with tempfile.NamedTemporaryFile('wt') as yamlfile:
-            yamlfile.write(test_yaml)
-            yamlfile.seek(0)
-            os.environ['TEST_YAML'] = yamlfile.name
-            config.update_from_yaml_env('TEST_YAML')
-            del os.environ['TEST_YAML']
-
-        assert config == {
-            'SETTING1': 'x',
-            'SETTING2': [1, 2],
-            'SETTING3': {'foo': 'bar'},
-        }
+        load_test_data(config, test_yaml, 'update_from_yaml_env', 'env')
+        assert config == test_config
 
     def test_update_from_yaml_file(self):
         config = ConfigLoader()
+        load_test_data(config, test_yaml, 'update_from_yaml_file', 'file')
+        assert config == test_config
 
-        with tempfile.NamedTemporaryFile('wt') as yamlfile:
-            yamlfile.write(test_yaml)
-            yamlfile.seek(0)
-            config.update_from_yaml_file(yamlfile.name)
+    def test_update_from_json_env(self):
+        config = ConfigLoader()
+        load_test_data(config, test_json, 'update_from_json_env', 'env')
+        assert config == test_config
 
-        assert config == {
-            'SETTING1': 'x',
-            'SETTING2': [1, 2],
-            'SETTING3': {'foo': 'bar'},
-        }
+    def test_update_from_json_file(self):
+        config = ConfigLoader()
+        load_test_data(config, test_json, 'update_from_json_file', 'file')
+        assert config == test_config
