@@ -31,7 +31,7 @@ extras_require.update(all=sorted(set().union(*extras_require.values())))
 
 setup(
     name='configloader',
-    version='0.1.1-dev0',
+    version='0.1.1',
     description=(
         "Python dict that supports common app configuration-loading scenarios."
     ),
