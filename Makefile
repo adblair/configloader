@@ -65,6 +65,7 @@ release: clean test-all
 	python setup.py bdist_wheel upload
 	python setup.py sdist upload
 	bumpversion --no-tag patch
+	git push
 	git push --tags
 
 devrelease: clean test-all
