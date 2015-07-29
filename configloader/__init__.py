@@ -55,7 +55,7 @@ class ConfigLoader(DictType):
             self.update_from_env_namespace(env_namespace)
 
     def update_from_obj(self, obj, criterion=lambda key: key.isupper()):
-        self.logger.debug('Loading config from {}'.format(obj))
+        self.logger.debug('Loading config from {0}'.format(obj))
         self.update(
             (key, getattr(obj, key))
             for key in filter(criterion, dir(obj))
@@ -94,7 +94,7 @@ class ConfigLoader(DictType):
             self._update_from_file_path(os.environ[env_var], loader)
         else:
             self.logger.debug(
-                'Not loading config from {}; variable not set'.format(env_var)
+                'Not loading config from {0}; variable not set'.format(env_var)
             )
 
     def _update_from_file(self, file_path_or_obj, loader):
@@ -109,20 +109,20 @@ class ConfigLoader(DictType):
                 self._update_from_file_obj(file_obj, loader)
         else:
             self.logger.debug(
-                'Not loading config from {}; file nonexistant'.format(
+                'Not loading config from {0}; file nonexistant'.format(
                     file_path
                 )
             )
 
     def _update_from_file_obj(self, file_obj, loader):
         if hasattr(file_obj, 'name'):
-            self.logger.debug(
-                'Loading config from {}'.format(os.path.abspath(file_obj.name))
-            )
+            self.logger.debug('Loading config from {0}'.format(
+                os.path.abspath(file_obj.name)
+            ))
         self.update(loader(file_obj))
 
     def __repr__(self):
-        return '{}({})'.format(type(self).__name__, dict.__repr__(self))
+        return '{0}({1})'.format(type(self).__name__, dict.__repr__(self))
 
 
 def _check_yaml_module():
