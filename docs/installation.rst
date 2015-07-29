@@ -4,4 +4,4 @@ Installation
 
 At the command line::
 
-    $ pip install configloader
+    $ pip install configloader[all]

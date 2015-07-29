@@ -22,6 +22,13 @@ test_requirements = [
     # TODO: put package test requirements here
 ]
 
+extras_require = {
+    'yaml':  ["PyYAML>=3"],
+    'attrdict': ["attrdict>=1"],
+}
+
+extras_require.update(all=sorted(set().union(*extras_require.values())))
+
 setup(
     name='configloader',
     version='0.1.1-dev0',
@@ -39,13 +46,14 @@ setup(
                  'configloader'},
     include_package_data=True,
     install_requires=requirements,
-    license="BSD",
+    extras_require = extras_require,
+    license="MIT",
     zip_safe=False,
     keywords='configloader',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
         'Programming Language :: Python :: 2.6',
