@@ -1,30 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
+from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
-    history = history_file.read().replace('.. :changelog:', '')
-
-requirements = [
-    # TODO: put package requirements here
-]
-
-test_requirements = [
-    # TODO: put package test requirements here
-]
-
 extras_require = {
-    'yaml':  ["PyYAML>=3"],
     'attrdict': ["attrdict>=1"],
+    'yaml':  ["PyYAML>=3"],
 }
 
 extras_require.update(all=sorted(set().union(*extras_require.values())))
@@ -32,26 +16,21 @@ extras_require.update(all=sorted(set().union(*extras_require.values())))
 setup(
     name='configloader',
     version='0.2.0-dev0',
-    description=(
-        "Python dict that supports common app configuration-loading scenarios."
-    ),
-    long_description=readme + '\n\n' + history,
+    packages=find_packages(),
+    extras_require=extras_require,
+
     author="Arthur Blair",
     author_email='adblair@gmail.com',
     url='https://github.com/adblair/configloader',
-    packages=[
-        'configloader',
-    ],
-    package_dir={'configloader':
-                 'configloader'},
-    include_package_data=True,
-    install_requires=requirements,
-    extras_require = extras_require,
+    description=(
+        "Python dict that supports common app configuration-loading scenarios."
+    ),
+    long_description=readme,
     license="MIT",
     zip_safe=False,
     keywords='configloader',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 2 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
@@ -62,6 +41,4 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
-    test_suite='tests',
-    tests_require=test_requirements
 )
