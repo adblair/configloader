@@ -41,24 +41,16 @@ lint:
 	flake8 configloader tests
 
 test:
-	python setup.py test
+	py.test
 
 test-all:
 	tox --skip-missing-interpreters
 
 coverage:
-	coverage run --source configloader setup.py test
-	coverage report -m
-	coverage html
-	open htmlcov/index.html
+	py.test --cov configloader
 
 docs:
-	rm -f docs/configloader.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ configloader
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	open docs/_build/html/index.html
+	sphinx-build -b html docs docs/_build
 
 release: clean test-all
 	bumpversion release
