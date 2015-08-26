@@ -23,6 +23,12 @@ try:
 except NameError:
     DictType = dict
 
+# Set basestring as an alias for the base string type in Python 3
+try:
+    basestring
+except NameError:
+    basestring = str
+
 log = logging.getLogger(__name__)
 
 
@@ -54,6 +60,14 @@ class ConfigLoader(DictType):
 
     def update_from_obj(self, obj, criterion=lambda key: key.isupper()):
         log.debug('Loading config from {0}'.format(obj))
+        if isinstance(obj, basestring):
+            if '.' in obj:
+                path, name = obj.rsplit('.', 1)
+                mod = __import__(path, globals(), locals(), [name], 0)
+                obj = getattr(mod, name)
+            else:
+                obj = __import__(obj, globals(), locals(), [], 0)
+            print(obj)
         self.update(
             (key, getattr(obj, key))
             for key in filter(criterion, dir(obj))

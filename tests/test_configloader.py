@@ -16,7 +16,6 @@ class test_obj:
     SETTING0 = 2
     SETTING1 = 'blah'
 
-
 test_obj_py = {
     'SETTING0': 2,
     'SETTING1': 'blah',
@@ -154,10 +153,19 @@ class TestConfigLoader:
         config_loader.update_from_obj(test_obj)
         assert config_loader == test_obj_py
 
+    def test_update_from_obj_string(self, config_loader):
+        imaginary_modules = {
+            'my': mock.MagicMock(),
+            'my.app': mock.MagicMock(settings=test_obj),
+        }
+        with mock.patch.dict('sys.modules', imaginary_modules):
+            config_loader.update_from_obj('my.app.settings')
+        assert config_loader == test_obj_py
+
     def test_update_from_obj_criterion(self, config_loader):
         config_loader.update_from_obj(
             test_obj,
-            criterion=lambda key: key[:1] != '_'
+            criterion=lambda key: key[:1] not in {'_', '@'}
         )
         assert config_loader == test_obj_py_no_criterion
 
