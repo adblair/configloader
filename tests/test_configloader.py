@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import contextlib
-import os
 import tempfile
 import textwrap
 
@@ -208,13 +207,10 @@ class TestConfigLoader:
             config_loader.update_from_json_file(json_filename)
         assert config_loader == test_json_output
 
-    def test_update_from_env_namespace(self):
-        config = ConfigLoader()
-        os.environ.update(test_env)
-        config.update_from_env_namespace('APP')
-        for key in test_env:
-            del os.environ[key]
-        assert config == test_env_output
+    def test_update_from_env_namespace(self, config_loader):
+        with mock.patch('os.environ', test_env):
+            config_loader.update_from_env_namespace('APP')
+        assert config_loader == test_env_output
 
     def test_namespace(self, config_loader):
         config_loader.update(test_config_namespace)
