@@ -1,1 +1,2 @@
+attrdict==2.0.0
 PyYAML==3.11
