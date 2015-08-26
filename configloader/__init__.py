@@ -67,7 +67,6 @@ class ConfigLoader(DictType):
                 obj = getattr(mod, name)
             else:
                 obj = __import__(obj, globals(), locals(), [], 0)
-            print(obj)
         self.update(
             (key, getattr(obj, key))
             for key in filter(criterion, dir(obj))
