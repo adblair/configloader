@@ -22,6 +22,12 @@ test_obj_py = {
     'SETTING1': 'blah',
 }
 
+test_obj_py_no_criterion = {
+    'setting0': 1,
+    'SETTING0': 2,
+    'SETTING1': 'blah',
+}
+
 
 test_yaml = textwrap.dedent("""
     SETTING1: x
@@ -147,6 +153,13 @@ class TestConfigLoader:
     def test_update_from_obj(self, config_loader):
         config_loader.update_from_obj(test_obj)
         assert config_loader == test_obj_py
+
+    def test_update_from_obj_criterion(self, config_loader):
+        config_loader.update_from_obj(
+            test_obj,
+            criterion=lambda key: key[:1] != '_'
+        )
+        assert config_loader == test_obj_py_no_criterion
 
     def test_update_from_yaml_env(self, config_loader, monkeypatch):
         with temp_config_file(test_yaml) as yaml_filename:
