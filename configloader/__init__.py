@@ -23,14 +23,12 @@ try:
 except NameError:
     DictType = dict
 
+log = logging.getLogger(__name__)
+
 
 class ConfigLoader(DictType):
 
     """A dict that supports common app configuration-loading scenarios."""
-
-    def __init__(self, *args, **kwargs):
-        self.logger = kwargs.pop('logger', logging.getLogger(__name__))
-        super(ConfigLoader, self).__init__(*args, **kwargs)
 
     def update_from(
             self,
@@ -55,7 +53,7 @@ class ConfigLoader(DictType):
             self.update_from_env_namespace(env_namespace)
 
     def update_from_obj(self, obj, criterion=lambda key: key.isupper()):
-        self.logger.debug('Loading config from {0}'.format(obj))
+        log.debug('Loading config from {0}'.format(obj))
         self.update(
             (key, getattr(obj, key))
             for key in filter(criterion, dir(obj))
@@ -93,7 +91,7 @@ class ConfigLoader(DictType):
         if env_var in os.environ:
             self._update_from_file_path(os.environ[env_var], loader)
         else:
-            self.logger.debug(
+            log.debug(
                 'Not loading config from {0}; variable not set'.format(env_var)
             )
 
@@ -108,7 +106,7 @@ class ConfigLoader(DictType):
             with open(file_path) as file_obj:
                 self._update_from_file_obj(file_obj, loader)
         else:
-            self.logger.debug(
+            log.debug(
                 'Not loading config from {0}; file nonexistant'.format(
                     file_path
                 )
@@ -116,7 +114,7 @@ class ConfigLoader(DictType):
 
     def _update_from_file_obj(self, file_obj, loader):
         if hasattr(file_obj, 'name'):
-            self.logger.debug('Loading config from {0}'.format(
+            log.debug('Loading config from {0}'.format(
                 os.path.abspath(file_obj.name)
             ))
         self.update(loader(file_obj))
