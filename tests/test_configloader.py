@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import contextlib
+import io
 import tempfile
 import textwrap
 
@@ -196,6 +197,14 @@ class TestConfigLoader:
             config_loader.update_from_yaml_file(yaml_filename)
         assert config_loader == test_yaml_output
 
+    def test_update_from_yaml_file_obj(self, config_loader):
+        if isinstance(test_yaml, bytes):
+            file_data = unicode(test_yaml)
+        else:
+            file_data = test_yaml
+        config_loader.update_from_yaml_file(io.StringIO(file_data))
+        assert config_loader == test_yaml_output
+
     def test_update_from_json_env(self, config_loader, monkeypatch):
         with temp_config_file(test_json) as json_filename:
             monkeypatch.setenv('CONFIG_JSON', json_filename)
@@ -205,6 +214,14 @@ class TestConfigLoader:
     def test_update_from_json_file(self, config_loader):
         with temp_config_file(test_json) as json_filename:
             config_loader.update_from_json_file(json_filename)
+        assert config_loader == test_json_output
+
+    def test_update_from_json_file_obj(self, config_loader):
+        if isinstance(test_json, bytes):
+            file_data = unicode(test_json)
+        else:
+            file_data = test_json
+        config_loader.update_from_json_file(io.StringIO(file_data))
         assert config_loader == test_json_output
 
     def test_update_from_env_namespace(self, config_loader):
