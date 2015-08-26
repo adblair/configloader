@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import contextlib
 import os
 import tempfile
 import textwrap
+
+import py.test
 
 from configloader import ConfigLoader
 
@@ -47,16 +50,17 @@ test_config2 = {
 }
 
 
-def load_test_data(config_loader, test_data, load_func, method):
+@py.test.fixture
+def config_loader():
+    return ConfigLoader()
+
+
+@contextlib.contextmanager
+def temp_config_file(test_data):
     with tempfile.NamedTemporaryFile('wt') as configfile:
         configfile.write(test_data)
         configfile.seek(0)
-        if method == 'file':
-            getattr(config_loader, load_func)(configfile.name)
-        elif method == 'env':
-            os.environ['TEMP_FILEPATH'] = configfile.name
-            getattr(config_loader, load_func)('TEMP_FILEPATH')
-            del os.environ['TEMP_FILEPATH']
+        yield configfile.name
 
 
 class TestConfigLoader:
@@ -64,6 +68,9 @@ class TestConfigLoader:
     def test_init(self):
         config = ConfigLoader(logger=1)
         assert config.logger == 1
+
+    def test_update_from(self):
+        pass
 
     def test_update_from_obj(self):
         config = ConfigLoader()
@@ -73,25 +80,27 @@ class TestConfigLoader:
         config.update_from_obj(obj)
         assert config == {'SETTING': 'value'}
 
-    def test_update_from_yaml_env(self):
-        config = ConfigLoader()
-        load_test_data(config, test_yaml, 'update_from_yaml_env', 'env')
-        assert config == test_config1
+    def test_update_from_yaml_env(self, config_loader, monkeypatch):
+        with temp_config_file(test_yaml) as yaml_filename:
+            monkeypatch.setenv('CONFIG_YAML', yaml_filename)
+            config_loader.update_from_yaml_env('CONFIG_YAML')
+        assert config_loader == test_config1
 
-    def test_update_from_yaml_file(self):
-        config = ConfigLoader()
-        load_test_data(config, test_yaml, 'update_from_yaml_file', 'file')
-        assert config == test_config1
+    def test_update_from_yaml_file(self, config_loader):
+        with temp_config_file(test_yaml) as yaml_filename:
+            config_loader.update_from_yaml_file(yaml_filename)
+        assert config_loader == test_config1
 
-    def test_update_from_json_env(self):
-        config = ConfigLoader()
-        load_test_data(config, test_json, 'update_from_json_env', 'env')
-        assert config == test_config1
+    def test_update_from_json_env(self, config_loader, monkeypatch):
+        with temp_config_file(test_json) as json_filename:
+            monkeypatch.setenv('CONFIG_JSON', json_filename)
+            config_loader.update_from_json_env('CONFIG_JSON')
+        assert config_loader == test_config1
 
-    def test_update_from_json_file(self):
-        config = ConfigLoader()
-        load_test_data(config, test_json, 'update_from_json_file', 'file')
-        assert config == test_config1
+    def test_update_from_json_file(self, config_loader):
+        with temp_config_file(test_json) as json_filename:
+            config_loader.update_from_json_file(json_filename)
+        assert config_loader == test_config1
 
     def test_update_from_env_namespace(self):
         config = ConfigLoader()
