@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import contextlib
 import io
 import tempfile
@@ -35,12 +37,14 @@ test_yaml = textwrap.dedent("""
       - 2
     SETTING3:
       foo: bar
+    NON_ASCII: ইঈউঊঋঌ
 """).strip()
 
 test_yaml_output = {
     'SETTING1': 'x',
     'SETTING2': [1, 2],
     'SETTING3': {'foo': 'bar'},
+    'NON_ASCII': 'ইঈউঊঋঌ',
 }
 
 
@@ -48,7 +52,8 @@ test_json = textwrap.dedent("""
     {
         "SETTING3": "x",
         "SETTING4": [1, 2],
-        "SETTING5": {"foo": "bar"}
+        "SETTING5": {"foo": "bar"},
+        "NON_ASCII": "ইঈউঊঋঌ"
     }
 """).strip()
 
@@ -56,6 +61,7 @@ test_json_output = {
     'SETTING3': 'x',
     'SETTING4': [1, 2],
     'SETTING5': {'foo': 'bar'},
+    'NON_ASCII': 'ইঈউঊঋঌ',
 }
 
 
@@ -81,6 +87,7 @@ test_combined_output = {
     'SETTING5': 'x',
     'SETTING6': 'y',
     'SETTING7': 'z',
+    'NON_ASCII': 'ইঈউঊঋঌ',
 }
 
 
@@ -108,8 +115,8 @@ def config_loader():
 
 @contextlib.contextmanager
 def temp_config_file(test_data):
-    with tempfile.NamedTemporaryFile('wt') as configfile:
-        configfile.write(test_data)
+    with tempfile.NamedTemporaryFile('wb') as configfile:
+        configfile.write(test_data.encode('utf-8'))
         configfile.seek(0)
         yield configfile.name
 
@@ -198,11 +205,7 @@ class TestConfigLoader:
         assert config_loader == test_yaml_output
 
     def test_update_from_yaml_file_obj(self, config_loader):
-        if isinstance(test_yaml, bytes):
-            file_data = unicode(test_yaml)
-        else:
-            file_data = test_yaml
-        config_loader.update_from_yaml_file(io.StringIO(file_data))
+        config_loader.update_from_yaml_file(io.StringIO(test_yaml))
         assert config_loader == test_yaml_output
 
     def test_update_from_json_env(self, config_loader, monkeypatch):
@@ -217,11 +220,7 @@ class TestConfigLoader:
         assert config_loader == test_json_output
 
     def test_update_from_json_file_obj(self, config_loader):
-        if isinstance(test_json, bytes):
-            file_data = unicode(test_json)
-        else:
-            file_data = test_json
-        config_loader.update_from_json_file(io.StringIO(file_data))
+        config_loader.update_from_json_file(io.StringIO(test_json))
         assert config_loader == test_json_output
 
     def test_update_from_env_namespace(self, config_loader):
