@@ -16,12 +16,12 @@ class test_obj:
     SETTING0 = 2
     SETTING1 = 'blah'
 
-test_obj_py = {
+test_obj_output = {
     'SETTING0': 2,
     'SETTING1': 'blah',
 }
 
-test_obj_py_no_criterion = {
+test_obj_output_no_criterion = {
     'setting0': 1,
     'SETTING0': 2,
     'SETTING1': 'blah',
@@ -37,7 +37,7 @@ test_yaml = textwrap.dedent("""
       foo: bar
 """).strip()
 
-test_yaml_py = {
+test_yaml_output = {
     'SETTING1': 'x',
     'SETTING2': [1, 2],
     'SETTING3': {'foo': 'bar'},
@@ -52,7 +52,7 @@ test_json = textwrap.dedent("""
     }
 """).strip()
 
-test_json_py = {
+test_json_output = {
     'SETTING3': 'x',
     'SETTING4': [1, 2],
     'SETTING5': {'foo': 'bar'},
@@ -65,14 +65,14 @@ test_env = {
     'APP_SETTING7': 'z',
 }
 
-test_env_py = {
+test_env_output = {
     'SETTING5': 'x',
     'SETTING6': 'y',
     'SETTING7': 'z',
 }
 
 
-test_combined_py = {
+test_combined_output = {
     'SETTING0': 2,
     'SETTING1': 'x',
     'SETTING2': [1, 2],
@@ -147,11 +147,11 @@ class TestConfigLoader:
                 json_file=json_filename,
                 env_namespace='APP'
             )
-        assert config_loader == test_combined_py
+        assert config_loader == test_combined_output
 
     def test_update_from_obj(self, config_loader):
         config_loader.update_from_obj(test_obj)
-        assert config_loader == test_obj_py
+        assert config_loader == test_obj_output
 
     def test_update_from_obj_string(self, config_loader):
         imaginary_modules = {
@@ -160,36 +160,36 @@ class TestConfigLoader:
         }
         with mock.patch.dict('sys.modules', imaginary_modules):
             config_loader.update_from_obj('my.app.settings')
-        assert config_loader == test_obj_py
+        assert config_loader == test_obj_output
 
     def test_update_from_obj_criterion(self, config_loader):
         config_loader.update_from_obj(
             test_obj,
             criterion=lambda key: key[:1] not in {'_', '@'}
         )
-        assert config_loader == test_obj_py_no_criterion
+        assert config_loader == test_obj_output_no_criterion
 
     def test_update_from_yaml_env(self, config_loader, monkeypatch):
         with temp_config_file(test_yaml) as yaml_filename:
             monkeypatch.setenv('CONFIG_YAML', yaml_filename)
             config_loader.update_from_yaml_env('CONFIG_YAML')
-        assert config_loader == test_yaml_py
+        assert config_loader == test_yaml_output
 
     def test_update_from_yaml_file(self, config_loader):
         with temp_config_file(test_yaml) as yaml_filename:
             config_loader.update_from_yaml_file(yaml_filename)
-        assert config_loader == test_yaml_py
+        assert config_loader == test_yaml_output
 
     def test_update_from_json_env(self, config_loader, monkeypatch):
         with temp_config_file(test_json) as json_filename:
             monkeypatch.setenv('CONFIG_JSON', json_filename)
             config_loader.update_from_json_env('CONFIG_JSON')
-        assert config_loader == test_json_py
+        assert config_loader == test_json_output
 
     def test_update_from_json_file(self, config_loader):
         with temp_config_file(test_json) as json_filename:
             config_loader.update_from_json_file(json_filename)
-        assert config_loader == test_json_py
+        assert config_loader == test_json_output
 
     def test_update_from_env_namespace(self):
         config = ConfigLoader()
@@ -197,7 +197,7 @@ class TestConfigLoader:
         config.update_from_env_namespace('APP')
         for key in test_env:
             del os.environ[key]
-        assert config == test_env_py
+        assert config == test_env_output
 
     def test_namespace(self):
         config = ConfigLoader(
