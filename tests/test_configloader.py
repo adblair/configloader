@@ -84,6 +84,23 @@ test_combined_output = {
 }
 
 
+test_config_namespace = {
+    'PART1_SETTING1': 'x',
+    'PART1_SETTING2': 'y',
+    'PART2_SETTING1': 'z',
+}
+
+test_config_namespace_output_part1 = {
+    'SETTING1': 'x',
+    'SETTING2': 'y',
+}
+
+test_config_namespace_output_part1_lower = {
+    'setting1': 'x',
+    'setting2': 'y',
+}
+
+
 @py.test.fixture
 def config_loader():
     return ConfigLoader()
@@ -199,13 +216,12 @@ class TestConfigLoader:
             del os.environ[key]
         assert config == test_env_output
 
-    def test_namespace(self):
-        config = ConfigLoader(
-            PART1_SETTING1='x',
-            PART1_SETTING2='y',
-            PART2_SETTING1='z',
-        )
-        assert config.namespace('PART1') == dict(
-            SETTING1='x',
-            SETTING2='y',
-        )
+    def test_namespace(self, config_loader):
+        config_loader.update(test_config_namespace)
+        assert config_loader.namespace('PART1') == \
+            test_config_namespace_output_part1
+
+    def test_namespace_lower(self, config_loader):
+        config_loader.update(test_config_namespace)
+        assert config_loader.namespace_lower('PART1') == \
+            test_config_namespace_output_part1_lower
