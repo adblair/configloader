@@ -126,7 +126,7 @@ class ConfigLoader(DictType):
             )
 
     def _update_from_file_obj(self, file_obj, loader):
-        if hasattr(file_obj, 'name'):
+        if hasattr(file_obj, 'name') and isinstance(file_obj.name, basestring):
             log.debug('Loading config from {0}'.format(
                 os.path.abspath(file_obj.name)
             ))
