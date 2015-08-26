@@ -44,7 +44,7 @@ test:
 	python setup.py test
 
 test-all:
-	tox
+	tox --skip-missing-interpreters
 
 coverage:
 	coverage run --source configloader setup.py test
