@@ -163,14 +163,14 @@ class TestConfigLoader:
         """Check that config chunks are applied in the expected order."""
         for key, value in test_env.items():
             monkeypatch.setenv(key, value)
-        with temp_config_file(test_yaml) as yaml_filename, \
-                temp_config_file(test_json) as json_filename:
-            config_loader.update_from(
-                obj=test_obj,
-                yaml_file=yaml_filename,
-                json_file=json_filename,
-                env_namespace='APP'
-            )
+        with temp_config_file(test_yaml) as yaml_filename:
+            with temp_config_file(test_json) as json_filename:
+                config_loader.update_from(
+                    obj=test_obj,
+                    yaml_file=yaml_filename,
+                    json_file=json_filename,
+                    env_namespace='APP'
+                )
         assert config_loader == test_combined_output
 
     def test_update_from_obj(self, config_loader):
@@ -189,7 +189,7 @@ class TestConfigLoader:
     def test_update_from_obj_criterion(self, config_loader):
         config_loader.update_from_obj(
             test_obj,
-            criterion=lambda key: key[:1] not in {'_', '@'}
+            criterion=lambda key: key[:1] not in ['_', '@']
         )
         assert config_loader == test_obj_output_no_criterion
 
