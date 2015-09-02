@@ -4,6 +4,11 @@
    contain the root `toctree` directive.
 
 
+.. toctree::
+   :hidden:
+
+   index
+
 .. include:: readme.rst
 
 
@@ -18,12 +23,9 @@ API Reference
 Development
 ===========
 
-.. toctree::
-   :maxdepth: 2
-
-   history
-   authors
-   contributing
+* :doc:`history`
+* :doc:`authors`
+* :doc:`contributing`
 
 
 ==================
