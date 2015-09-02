@@ -3,21 +3,30 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ConfigLoader's documentation!
-======================================
 
-Contents:
+.. include:: readme.rst
+
+
+API Reference
+-------------
+
+.. autoclass:: configloader.ConfigLoader
+   :members:
+
+
+===========
+Development
+===========
 
 .. toctree::
    :maxdepth: 2
 
-   readme
-   installation
-   usage
-   contributing
-   authors
    history
+   authors
+   contributing
 
+
+==================
 Indices and tables
 ==================
 

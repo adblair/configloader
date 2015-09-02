@@ -34,7 +34,14 @@ log = logging.getLogger(__name__)
 
 class ConfigLoader(DictType):
 
-    """A dict that supports common app configuration-loading scenarios."""
+    """
+    A dict that supports common app configuration-loading scenarios.
+
+    If `AttrDict`_ is installed, then elements can be accessed as both keys
+    and attributes.
+
+    .. _AttrDict: https://github.com/bcj/AttrDict
+    """
 
     def update_from(
             self,
@@ -59,6 +66,19 @@ class ConfigLoader(DictType):
             self.update_from_env_namespace(env_namespace)
 
     def update_from_obj(self, obj, criterion=lambda key: key.isupper()):
+        """
+        Update dict from the attributes of a module, class or other object.
+
+        By default only attributes with all-uppercase names will be retrieved.
+        Use the ``criterion`` argument to modify that behaviour.
+
+        :arg obj: Either the actual module/object, or its absolute name, e.g.
+            'my_app.settings'.
+
+        :arg criterion: Callable that must return True when passed the name
+            of an attribute, if that attribute is to be used.
+        :type criterion: :py:class:`function`
+        """
         log.debug('Loading config from {0}'.format(obj))
         if isinstance(obj, basestring):
             if '.' in obj:
@@ -73,20 +93,67 @@ class ConfigLoader(DictType):
         )
 
     def update_from_yaml_env(self, env_var):
+        """
+        Update dict from the YAML file specified in an environment variable.
+
+        The `PyYAML`_ package must be installed before this method can be used.
+
+        :arg env_var: Environment variable name.
+        :type env_var: :py:class:`str`
+
+        .. _PyYAML: http://pyyaml.org/wiki/PyYAML
+        """
         _check_yaml_module()
         return self._update_from_env(env_var, yaml.safe_load)
 
     def update_from_yaml_file(self, file_path_or_obj):
+        """
+        Update dict from a YAML file.
+
+        The `PyYAML`_ package must be installed before this method can be used.
+
+        :arg file_path_or_obj: Filepath or file-like object.
+
+        .. _PyYAML: http://pyyaml.org/wiki/PyYAML
+        """
         _check_yaml_module()
         return self._update_from_file(file_path_or_obj, yaml.safe_load)
 
     def update_from_json_env(self, env_var):
+        """
+        Update dict from the JSON file specified in an environment variable.
+
+        :arg env_var: Environment variable name.
+        :type env_var: :py:class:`str`
+        """
         return self._update_from_env(env_var, json.load)
 
     def update_from_json_file(self, file_path_or_obj):
+        """
+        Update dict from a JSON file.
+
+        :arg file_path_or_obj: Filepath or file-like object.
+        """
         return self._update_from_file(file_path_or_obj, json.load)
 
     def update_from_env_namespace(self, namespace):
+        """
+        Update dict from any environment variables that have a given prefix.
+
+        The common prefix is removed when converting the variable names to
+        dictionary keys. For example, if the following environment variables
+        were set::
+
+            MY_APP_SETTING1=foo
+            MY_APP_SETTING2=bar
+
+        Then calling ``.update_from_env_namespace('MY_APP')`` would be
+        equivalent to calling
+        ``.update({'SETTING1': 'foo', 'SETTING2': 'bar'})``.
+
+        :arg namespace: Common environment variable prefix.
+        :type env_var: :py:class:`str`
+        """
         self.update(ConfigLoader(os.environ).namespace(namespace))
 
     def namespace(self, namespace, key_transform=lambda key: key):
