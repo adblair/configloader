@@ -273,8 +273,8 @@ class ConfigLoader(DictType):
 
 def _check_yaml_module():
     try:
-        yaml
-    except NameError:
+        import yaml  # noqa
+    except ImportError:
         raise ImportError(
             'yaml module not found; please install PyYAML in order to enable '
             'configuration to be loaded from YAML files',

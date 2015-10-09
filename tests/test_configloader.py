@@ -4,13 +4,14 @@ from __future__ import unicode_literals
 
 import contextlib
 import io
+import random
 import tempfile
 import textwrap
 
 import mock
 import py.test
 
-from configloader import ConfigLoader
+from configloader import ConfigLoader, _check_yaml_module
 
 
 class test_obj:
@@ -177,13 +178,21 @@ class TestConfigLoader:
         config_loader.update_from_object(test_obj)
         assert config_loader == test_obj_output
 
-    def test_update_from_object_string(self, config_loader):
+    def test_update_from_object_module(self, config_loader):
         imaginary_modules = {
-            'my': mock.MagicMock(),
-            'my.app': mock.MagicMock(settings=test_obj),
+            'settings': test_obj,
         }
         with mock.patch.dict('sys.modules', imaginary_modules):
-            config_loader.update_from_object('my.app.settings')
+            config_loader.update_from_object('settings')
+        assert config_loader == test_obj_output
+
+    def test_update_from_object_package_module(self, config_loader):
+        imaginary_modules = {
+            'app': mock.MagicMock(settings=test_obj),
+            'app.settings': test_obj,
+        }
+        with mock.patch.dict('sys.modules', imaginary_modules):
+            config_loader.update_from_object('app.settings')
         assert config_loader == test_obj_output
 
     def test_update_from_object_criterion(self, config_loader):
@@ -237,3 +246,14 @@ class TestConfigLoader:
         config_loader.update(test_config_namespace)
         assert config_loader.namespace_lower('PART1') == \
             test_config_namespace_output_part1_lower
+
+    def test_update_from_file_path_missing(self, config_loader):
+        # No error raised when non-existant filepath is given.
+        config_loader._update_from_file(str(random.randint(1e10, 1e12)), None)
+
+    def test_update_from_env_missing(self, config_loader):
+        # No error raised when non-existant env var is given.
+        config_loader._update_from_env(str(random.randint(1e10, 1e12)), None)
+
+    def test_repr(self):
+        assert repr(ConfigLoader(X=1)) == "ConfigLoader({'X': 1})"
