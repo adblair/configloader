@@ -82,7 +82,7 @@ bump-release:
 
 upload:
 	python setup.py sdist upload
-	python setup.py sdist bdist_wheel upload
+	python setup.py bdist_wheel upload
 
 assert-nondirty:
 	python -c "from bumpversion import Git; Git.assert_nondirty()"
