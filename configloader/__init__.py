@@ -53,7 +53,7 @@ class ConfigLoader(DictType):
             env_namespace=None,
             ):
         if obj:
-            self.update_from_obj(obj)
+            self.update_from_object(obj)
         if yaml_env:
             self.update_from_yaml_env(yaml_env)
         if yaml_file:
@@ -65,7 +65,7 @@ class ConfigLoader(DictType):
         if env_namespace:
             self.update_from_env_namespace(env_namespace)
 
-    def update_from_obj(self, obj, criterion=lambda key: key.isupper()):
+    def update_from_object(self, obj, criterion=lambda key: key.isupper()):
         """
         Update dict from the attributes of a module, class or other object.
 
@@ -78,6 +78,8 @@ class ConfigLoader(DictType):
         :arg criterion: Callable that must return True when passed the name
             of an attribute, if that attribute is to be used.
         :type criterion: :py:class:`function`
+
+        .. versionadded:: 1.0
         """
         log.debug('Loading config from {0}'.format(obj))
         if isinstance(obj, basestring):

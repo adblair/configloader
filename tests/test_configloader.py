@@ -127,7 +127,7 @@ class TestConfigLoader:
         config = ConfigLoader(logger=1)
         assert config.logger == 1
 
-    @mock.patch('configloader.ConfigLoader.update_from_obj')
+    @mock.patch('configloader.ConfigLoader.update_from_object')
     @mock.patch('configloader.ConfigLoader.update_from_yaml_env')
     @mock.patch('configloader.ConfigLoader.update_from_yaml_file')
     @mock.patch('configloader.ConfigLoader.update_from_json_env')
@@ -173,21 +173,21 @@ class TestConfigLoader:
                 )
         assert config_loader == test_combined_output
 
-    def test_update_from_obj(self, config_loader):
-        config_loader.update_from_obj(test_obj)
+    def test_update_from_object(self, config_loader):
+        config_loader.update_from_object(test_obj)
         assert config_loader == test_obj_output
 
-    def test_update_from_obj_string(self, config_loader):
+    def test_update_from_object_string(self, config_loader):
         imaginary_modules = {
             'my': mock.MagicMock(),
             'my.app': mock.MagicMock(settings=test_obj),
         }
         with mock.patch.dict('sys.modules', imaginary_modules):
-            config_loader.update_from_obj('my.app.settings')
+            config_loader.update_from_object('my.app.settings')
         assert config_loader == test_obj_output
 
-    def test_update_from_obj_criterion(self, config_loader):
-        config_loader.update_from_obj(
+    def test_update_from_object_criterion(self, config_loader):
+        config_loader.update_from_object(
             test_obj,
             criterion=lambda key: key[:1] not in ['_', '@']
         )

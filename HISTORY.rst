@@ -4,6 +4,11 @@
 Release History
 ===============
 
+1.0.0 (2015-10-09)
+------------------
+
+* Renamed :py:meth:`~configloader.ConfigLoader.update_from_obj` to :py:meth:`~configloader.ConfigLoader.update_from_object`.
+
 0.2.0 (2015-08-30)
 ------------------
 

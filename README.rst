@@ -46,7 +46,7 @@ Example usage
 
     >>> from configloader import ConfigLoader
     >>> config = ConfigLoader
-    >>> config.update_from_obj('my_app.settings')
+    >>> config.update_from_object('my_app.settings')
     >>> config.update_from_yaml_file('config.yml')
 
 
