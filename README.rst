@@ -53,7 +53,7 @@ Example usage
 Documentation
 -------------
 
-https://configloader.readthedocs.org
+https://configloader.readthedocs.org/en/stable/
 
 
 .. _flask.Config: http://flask.pocoo.org/docs/0.10/api/#configuration
