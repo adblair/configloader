@@ -15,6 +15,8 @@
 API Reference
 -------------
 
+.. module:: configloader
+
 .. autoclass:: configloader.ConfigLoader
    :members:
 
