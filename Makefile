@@ -1,4 +1,4 @@
-.PHONY: clean-pyc clean-build docs clean
+.PHONY: clean-pyc clean-build docs clean release release-dev bump-release bump-patch bump-minor bump-major upload assert-nondirty
 
 help:
 	@echo "clean - remove all build, test, coverage and Python artifacts"
@@ -10,12 +10,12 @@ help:
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - make a new release, upload it to PyPI and push to Git"
-	@echo "devrelease - upload a development release"
 	@echo "dist - package"
 	@echo "install - install the package to the active Python's site-packages"
-	@echo "bumpminor - increment the minor version number of the next release"
-	@echo "bumpmajor - increment the major version number of the next release"
+	@echo "release:     package and upload the current version as a full release"
+	@echo "release-dev: package and upload the current version as a developmental release"
+	@echo "bump-major:  bump the major version number"
+	@echo "bump-minor:  bump the minor version number"
 
 clean: clean-build clean-pyc clean-test
 
@@ -52,18 +52,6 @@ coverage:
 docs:
 	sphinx-build -b html docs docs/_build
 
-release: clean test-all
-	bumpversion release
-	python setup.py bdist_wheel upload
-	python setup.py sdist upload
-	bumpversion --no-tag patch
-	git push
-	git push --tags
-
-devrelease: clean test-all
-	python setup.py bdist_wheel upload
-	python setup.py sdist upload
-
 dist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel
@@ -72,8 +60,33 @@ dist: clean
 install: clean
 	python setup.py install
 
-bumpminor:
-	bumpversion --no-tag minor
+release: | bump-release upload bump-patch
+	git push --follow-tags
 
-bumpmajor:
-	bumpversion --no-tag major
+release-dev: | assert-nondirty upload
+	git tag "v$(call current_version)"
+	bumpversion --message "Bump development release number" dev
+	git push --follow-tags
+
+bump-major:
+	$(call targetnext, major)
+
+bump-minor:
+	$(call targetnext, minor)
+
+bump-patch:
+	$(call targetnext, patch)
+
+bump-release:
+	bumpversion --tag --message "Release version {new_version}" release
+
+upload:
+	python setup.py sdist upload
+	python setup.py sdist bdist_wheel upload
+
+assert-nondirty:
+	python -c "from bumpversion import Git; Git.assert_nondirty()"
+
+current_version = `grep 'current_version\s*=' setup.cfg | cut -d "=" -f 2 | sed "s/\s//g"`
+next_release = `bumpversion --dry-run --verbose $(1) 2>&1 | grep -E "New version will be" | sed -r "s/^.* '//" | sed -r "s/(\.dev[0-9]+)?'//"`
+targetnext = bumpversion --message "Target version $(call next_release, $(1)) for next release" $(1)
