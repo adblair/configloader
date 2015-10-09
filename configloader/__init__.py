@@ -43,28 +43,6 @@ class ConfigLoader(DictType):
     .. _AttrDict: https://github.com/bcj/AttrDict
     """
 
-    def update_from(
-            self,
-            obj=None,
-            yaml_env=None,
-            yaml_file=None,
-            json_env=None,
-            json_file=None,
-            env_namespace=None,
-            ):
-        if obj:
-            self.update_from_object(obj)
-        if yaml_env:
-            self.update_from_yaml_env(yaml_env)
-        if yaml_file:
-            self.update_from_yaml_file(yaml_file)
-        if json_env:
-            self.update_from_json_env(json_env)
-        if json_file:
-            self.update_from_json_file(json_file)
-        if env_namespace:
-            self.update_from_env_namespace(env_namespace)
-
     def update_from_object(self, obj, criterion=lambda key: key.isupper()):
         """
         Update dict from the attributes of a module, class or other object.
@@ -158,7 +136,70 @@ class ConfigLoader(DictType):
         """
         self.update(ConfigLoader(os.environ).namespace(namespace))
 
+    def update_from(
+            self,
+            obj=None,
+            yaml_env=None,
+            yaml_file=None,
+            json_env=None,
+            json_file=None,
+            env_namespace=None,
+            ):
+        """
+        Update dict from several sources at once.
+
+        This is simply a convenience method that can be used as an alternative
+        to making several calls to the various
+        :meth:`~ConfigLoader.update_from_*` methods.
+
+        Updates will be applied in the order that the parameters are listed
+        below, with each source taking precedence over those before it.
+
+        :arg obj: Object or name of object, e.g. 'myapp.settings'.
+        :arg yaml_env: Name of an environment variable containing the path to
+            a YAML config file.
+        :arg yaml_file: Path to a YAML config file, or a file-like object.
+        :arg json_env: Name of an environment variable containing the path to
+            a JSON config file.
+        :arg json_file: Path to a JSON config file, or a file-like object.
+        :arg env_namespace: Common prefix of the environment variables
+            containing the desired config.
+        """
+        if obj:
+            self.update_from_object(obj)
+        if yaml_env:
+            self.update_from_yaml_env(yaml_env)
+        if yaml_file:
+            self.update_from_yaml_file(yaml_file)
+        if json_env:
+            self.update_from_json_env(json_env)
+        if json_file:
+            self.update_from_json_file(json_file)
+        if env_namespace:
+            self.update_from_env_namespace(env_namespace)
+
     def namespace(self, namespace, key_transform=lambda key: key):
+        """
+        Return a copy with only the keys from a given namespace.
+
+        The common prefix will be removed in the returned dict. Example::
+
+            >>> from configloader import ConfigLoader
+            >>> config = ConfigLoader(
+            ...     MY_APP_SETTING1='a',
+            ...     EXTERNAL_LIB_SETTING1='b',
+            ...     EXTERNAL_LIB_SETTING2='c',
+            ... )
+            >>> config.namespace('EXTERNAL_LIB')
+            ConfigLoader({'SETTING1': 'b', 'SETTING2': 'c'})
+
+        :arg namespace: Common prefix.
+        :arg key_transform: Function through which to pass each key when
+            creating the new dictionary.
+
+        :return: New config dict.
+        :rtype: :class:`ConfigLoader`
+        """
         namespace = namespace.rstrip('_') + '_'
         return ConfigLoader(
             (key_transform(key[len(namespace):]), value)
@@ -167,6 +208,31 @@ class ConfigLoader(DictType):
         )
 
     def namespace_lower(self, namespace):
+        """
+        Return a copy with only the keys from a given namespace, lower-cased.
+
+        The keys in the returned dict will be transformed to lower case after
+        filtering, so they can be easily passed as keyword arguments to other
+        functions. This is just syntactic sugar for calling
+        :meth:`~ConfigLoader.namespace` with
+        ``key_transform=lambda key: key.lower()``.
+
+        Example::
+
+            >>> from configloader import ConfigLoader
+            >>> config = ConfigLoader(
+            ...     MY_APP_SETTING1='a',
+            ...     EXTERNAL_LIB_SETTING1='b',
+            ...     EXTERNAL_LIB_SETTING2='c',
+            ... )
+            >>> config.namespace_lower('EXTERNAL_LIB')
+            ConfigLoader({'setting1': 'b', 'setting2': 'c'})
+
+        :arg namespace: Common prefix.
+
+        :return: New config dict.
+        :rtype: :class:`ConfigLoader`
+        """
         return self.namespace(namespace, key_transform=lambda key: key.lower())
 
     def _update_from_env(self, env_var, loader):
