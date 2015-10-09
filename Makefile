@@ -60,7 +60,7 @@ dist: clean
 install: clean
 	python setup.py install
 
-release: | bump-release upload bump-patch
+release: | test-all bump-release upload bump-patch
 	git push --follow-tags
 
 release-dev: | assert-nondirty upload
