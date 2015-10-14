@@ -15,7 +15,7 @@ extras_require.update(all=sorted(set().union(*extras_require.values())))
 
 setup(
     name='configloader',
-    version='1.0.1.dev0',
+    version='1.0.1',
     packages=find_packages(),
     extras_require=extras_require,
 

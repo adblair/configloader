@@ -3,7 +3,7 @@
 
 __author__ = 'Arthur Blair'
 __email__ = 'adblair@gmail.com'
-__version__ = '1.0.1.dev0'
+__version__ = '1.0.1'
 
 
 import json
