@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""ConfigLoader."""
 
 __author__ = 'Arthur Blair'
 __email__ = 'adblair@gmail.com'
@@ -33,7 +34,6 @@ log = logging.getLogger(__name__)
 
 
 class ConfigLoader(DictType):
-
     """
     A dict that supports common app configuration-loading scenarios.
 
@@ -268,6 +268,7 @@ class ConfigLoader(DictType):
         self.update(loader(file_obj))
 
     def __repr__(self):
+        """Represent as a string."""
         return '{0}({1})'.format(type(self).__name__, dict.__repr__(self))
 
 

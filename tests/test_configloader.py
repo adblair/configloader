@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+"""Tests."""
+
 from __future__ import unicode_literals
 
 import contextlib
@@ -11,7 +13,7 @@ import textwrap
 import mock
 import py.test
 
-from configloader import ConfigLoader, _check_yaml_module
+from configloader import ConfigLoader
 
 
 class test_obj:
