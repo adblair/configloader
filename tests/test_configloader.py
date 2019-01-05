@@ -15,11 +15,25 @@ import py.test
 
 from configloader import ConfigLoader
 
+try:
+    import yaml  # noqa: F401
+except ImportError:
+    yaml_available = False
+else:
+    yaml_available = True
+
+
+skip_if_yaml_not_available = py.test.mark.skipif(
+    not yaml_available,
+    reason='PyYAML not installed',
+)
+
 
 class test_obj:
     setting0 = 1
     SETTING0 = 2
     SETTING1 = 'blah'
+
 
 test_obj_output = {
     'SETTING0': 2,
@@ -128,7 +142,7 @@ class TestConfigLoader:
 
     def test_init(self):
         config = ConfigLoader(logger=1)
-        assert config.logger == 1
+        assert config['logger'] == 1
 
     @mock.patch('configloader.ConfigLoader.update_from_object')
     @mock.patch('configloader.ConfigLoader.update_from_yaml_env')
@@ -162,6 +176,7 @@ class TestConfigLoader:
         mock_ufjf.assert_called_with(5)
         mock_ufen.assert_called_with(6)
 
+    @skip_if_yaml_not_available
     def test_update_from_merge(self, config_loader, monkeypatch):
         """Check that config chunks are applied in the expected order."""
         for key, value in test_env.items():
@@ -204,17 +219,20 @@ class TestConfigLoader:
         )
         assert config_loader == test_obj_output_no_criterion
 
+    @skip_if_yaml_not_available
     def test_update_from_yaml_env(self, config_loader, monkeypatch):
         with temp_config_file(test_yaml) as yaml_filename:
             monkeypatch.setenv('CONFIG_YAML', yaml_filename)
             config_loader.update_from_yaml_env('CONFIG_YAML')
         assert config_loader == test_yaml_output
 
+    @skip_if_yaml_not_available
     def test_update_from_yaml_file(self, config_loader):
         with temp_config_file(test_yaml) as yaml_filename:
             config_loader.update_from_yaml_file(yaml_filename)
         assert config_loader == test_yaml_output
 
+    @skip_if_yaml_not_available
     def test_update_from_yaml_file_obj(self, config_loader):
         config_loader.update_from_yaml_file(io.StringIO(test_yaml))
         assert config_loader == test_yaml_output

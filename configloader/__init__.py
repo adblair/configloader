@@ -276,9 +276,10 @@ def _check_yaml_module():
     try:
         import yaml  # noqa
     except ImportError:
-        raise ImportError(
+        err = ImportError(
             'yaml module not found; please install PyYAML in order to enable '
             'configuration to be loaded from YAML files',
-            name='yaml',
-            path=__file__,
         )
+        err.name = 'yaml'
+        err.path = __file__
+        raise err
