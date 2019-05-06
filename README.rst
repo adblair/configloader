@@ -25,7 +25,7 @@ Easily load config settings from:
 * YAML files
 * Environment variables
 
-Supports Python 2.6+ and 3.3+.
+Supports Python 2.7+ and 3.4+.
 
 
 Installation
