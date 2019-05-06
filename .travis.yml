@@ -1,21 +1,14 @@
 dist: xenial
 language: python
 python: 3.7
-env:
-  - TOXENV=py37
-  - TOXENV=py36
-  - TOXENV=py35
-  - TOXENV=py34
-  - TOXENV=py33
-  - TOXENV=py27
-  - TOXENV=py26
-  - TOXENV=style
-  - TOXENV=docs
-  - TOXENV=coveralls
-  - TOXENV=extras-attrdict
-  - TOXENV=extras-yaml
-  - TOXENV=extras-none
-  - TOXENV=pypy
-  - TOXENV=pypy3
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "pypy3.5"
 install: pip install tox
 script: tox
